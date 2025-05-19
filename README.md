@@ -84,8 +84,6 @@ Clone o repositório: https://github.com/suellykarine/api-sound-wave
 
 ```
 
-![alt text](image.png)
-
 ### Home
 
 ![Home](./src/assets/image-2.png)
