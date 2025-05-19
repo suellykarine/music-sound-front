@@ -1,9 +1,10 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaMusic, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { confirmDelete } from "../../../components/ui/ConfirmToast";
+import { apiPlaylist } from "../../../services/apiPlaylist";
 import { musicService } from "../../../services/musicService";
 import { debounce } from "../../../utils/debounce";
 import {
@@ -51,12 +52,7 @@ const PlaylistPage = () => {
         const token = localStorage.getItem("access_token");
         if (!token) throw new Error("Usuário não autenticado");
 
-        const response = await axios.get(
-          "http://localhost:8000/musica/playlists/",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await apiPlaylist.get("/");
 
         setPlaylists(
           response.data.map((pl: any) => ({
@@ -203,11 +199,7 @@ const PlaylistPage = () => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Token não encontrado");
 
-      const response = await axios.post(
-        "http://localhost:8000/musica/playlists/",
-        { nome: newPlaylistName },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await apiPlaylist.post("/", { nome: newPlaylistName });
 
       const newPlaylist = {
         id: response.data.id,
@@ -226,6 +218,31 @@ const PlaylistPage = () => {
     } finally {
       setLoadingCreate(false);
     }
+  };
+
+  const deletePlaylist = async (playlistId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    confirmDelete("Tem certeza que deseja excluir esta playlist?", async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) throw new Error("Usuário não autenticado");
+
+        await apiPlaylist.delete(`/${playlistId}/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setPlaylists(playlists.filter((p) => p.id !== playlistId));
+        toast.success("Playlist excluída com sucesso!");
+
+        if (currentPlaylist?.id === playlistId) {
+          setCurrentPlaylist(null);
+        }
+      } catch (error) {
+        console.error("Erro ao excluir playlist:", error);
+        toast.error("Erro ao excluir playlist. Tente novamente.");
+      }
+    });
   };
 
   const formatDuration = (seconds: number) => {
@@ -250,7 +267,7 @@ const PlaylistPage = () => {
       ) : (
         <PlaylistsGrid>
           {playlists.length === 0 ? (
-            <p>Nenhuma playlist encontrada. Crie sua primeira playlist!</p>
+            <p id="info-playlist">Crie sua primeira playlist!</p>
           ) : (
             playlists.map((playlist) => (
               <PlaylistCard
@@ -262,7 +279,10 @@ const PlaylistPage = () => {
                 </PlaylistCover>
                 <h3>{playlist.name}</h3>
                 <p>{playlist.tracks?.length || 0} música(s)</p>
-                <FaTrash id="trash" />
+                <FaTrash
+                  id="trash"
+                  onClick={(e) => deletePlaylist(playlist.id, e)}
+                />
               </PlaylistCard>
             ))
           )}

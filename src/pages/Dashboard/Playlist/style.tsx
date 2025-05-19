@@ -41,6 +41,11 @@ export const PlaylistsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
+
+  #info-playlist {
+    color: #00dbde;
+    font-size: 18px;
+  }
 `;
 
 export const PlaylistCard = styled.div`
