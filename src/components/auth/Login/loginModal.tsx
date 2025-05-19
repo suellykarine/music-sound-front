@@ -1,11 +1,11 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import * as yup from "yup";
+import { api } from "../../../services/api";
 import { Button } from "../../ui/Button";
-import { Notification } from "../../ui/Notification";
 import {
   CloseButton,
   ErrorText,
@@ -40,13 +40,11 @@ export const LoginModal = ({
     resolver: yupResolver(schema),
   });
   const navigate = useNavigate();
-  const [notification, setNotification] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/usuario/login/",
+      const response = await api.post(
+        "/usuario/login/",
         {
           email: data.email,
           senha: data.password,
@@ -60,19 +58,29 @@ export const LoginModal = ({
       localStorage.setItem("access_token", response.data.access);
       localStorage.setItem("refresh_token", response.data.refresh);
 
-      setNotification("Login realizado com sucesso!");
+      toast.success("Login efetuado com sucesso!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       setTimeout(() => {
-        setNotification("");
         navigate("/dashboard");
       }, 2000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorResponse = error.response?.data;
-        setErrorMessage(
-          errorResponse?.error || "Erro no login. Verifique suas credenciais."
-        );
+        toast.error("Erro no login. Verifique suas credenciais.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
       } else {
-        setErrorMessage("Erro desconhecido. Tente novamente.");
+        toast.error("Erro no login. Tente novamente.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
       }
     }
   };
@@ -82,21 +90,6 @@ export const LoginModal = ({
       <ModalContent>
         <CloseButton onClick={onClose}>✕</CloseButton>
         <h2>Login</h2>
-
-        {notification && (
-          <Notification
-            message={notification}
-            type="success"
-            onClose={() => setNotification("")}
-          />
-        )}
-        {errorMessage && (
-          <Notification
-            message={errorMessage}
-            type="error"
-            onClose={() => setErrorMessage("")}
-          />
-        )}
 
         <Form onSubmit={handleSubmit(onSubmit)}>
           <InputGroup>
@@ -130,6 +123,7 @@ export const LoginModal = ({
           Não tem uma conta?{" "}
           <SwitchButton onClick={onSwitchToRegister}>Cadastre-se</SwitchButton>
         </SwitchText>
+        <ToastContainer theme="colored" />
       </ModalContent>
     </ModalOverlay>
   );
