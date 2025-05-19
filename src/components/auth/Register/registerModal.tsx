@@ -1,11 +1,10 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import axios from "axios";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import * as yup from "yup";
+import { api } from "../../../services/api";
 import { Button } from "../../ui/Button";
-
-import { Notification } from "../../ui/Notification";
 import {
   CloseButton,
   ErrorText,
@@ -45,25 +44,30 @@ export const RegisterModal = ({
     resolver: yupResolver(schema),
   });
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-
   const onSubmit = async (data: FormData) => {
     try {
-      await axios.post("http://127.0.0.1:8000/usuario/registrar/", {
+      await api.post("/usuario/registrar/", {
         email: data.email,
         senha: data.password,
       });
-      setSuccessMessage("Usuário cadastrado com sucesso!");
+
+      toast.success("Usuário cadastrado com sucesso!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
       setTimeout(() => {
-        setSuccessMessage("");
         onClose();
       }, 2000);
     } catch (error) {
-      setErrorMessage(
-        "Erro no cadastro. Verifique os dados e tente novamente."
-      );
-      setTimeout(() => setErrorMessage(""), 3000);
+      toast.error("Erro no cadastro. Verifique os dados e tente novamente.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
   };
 
@@ -112,26 +116,13 @@ export const RegisterModal = ({
             Criar Conta
           </Button>
         </Form>
-        {successMessage && (
-          <Notification
-            message={successMessage}
-            type="success"
-            onClose={() => setSuccessMessage("")}
-          />
-        )}
-
-        {errorMessage && (
-          <Notification
-            message={errorMessage}
-            type="error"
-            onClose={() => setErrorMessage("")}
-          />
-        )}
 
         <SwitchText>
           Já tem uma conta?{" "}
           <SwitchButton onClick={onSwitchToLogin}>Faça login</SwitchButton>
         </SwitchText>
+
+        <ToastContainer theme="colored" />
       </ModalContent>
     </ModalOverlay>
   );

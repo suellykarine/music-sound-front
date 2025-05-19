@@ -86,7 +86,7 @@ Clone o repositório: https://github.com/suellykarine/api-sound-wave
 
 ### Home
 
-![Home](./src/assets/image-2.png)
+![home](./src/assets/image-2.png)
 
 ### Cadastro
 
