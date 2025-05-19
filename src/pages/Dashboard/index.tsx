@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   FaCog,
   FaFolder,
@@ -6,7 +7,7 @@ import {
   FaSearch,
   FaSignOutAlt,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MusicCard } from "./Card/musicCard";
 import {
   DashboardContainer,
@@ -29,6 +30,19 @@ import {
 } from "./style";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    navigate("/");
+  };
   return (
     <DashboardContainer>
       <SidebarContainer>
@@ -52,7 +66,7 @@ const Dashboard = () => {
             <FaCog /> Configurações
             <Tooltip>Em breve</Tooltip>
           </MenuItem>
-          <MenuItem as={Link} to="/">
+          <MenuItem onClick={handleLogout}>
             <FaSignOutAlt /> Sair
           </MenuItem>
         </nav>

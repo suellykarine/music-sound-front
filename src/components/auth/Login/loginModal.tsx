@@ -1,8 +1,11 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
-
 import { Button } from "../../ui/Button";
+import { Notification } from "../../ui/Notification";
 import {
   CloseButton,
   ErrorText,
@@ -36,10 +39,42 @@ export const LoginModal = ({
   } = useForm<FormData>({
     resolver: yupResolver(schema),
   });
+  const navigate = useNavigate();
+  const [notification, setNotification] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const onSubmit = (data: FormData) => {
-    console.log("Dados do login:", data);
-    onClose();
+  const onSubmit = async (data: FormData) => {
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/usuario/login/",
+        {
+          email: data.email,
+          senha: data.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
+
+      setNotification("Login realizado com sucesso!");
+      setTimeout(() => {
+        setNotification("");
+        navigate("/dashboard");
+      }, 2000);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorResponse = error.response?.data;
+        setErrorMessage(
+          errorResponse?.error || "Erro no login. Verifique suas credenciais."
+        );
+      } else {
+        setErrorMessage("Erro desconhecido. Tente novamente.");
+      }
+    }
   };
 
   return (
@@ -47,6 +82,21 @@ export const LoginModal = ({
       <ModalContent>
         <CloseButton onClick={onClose}>✕</CloseButton>
         <h2>Login</h2>
+
+        {notification && (
+          <Notification
+            message={notification}
+            type="success"
+            onClose={() => setNotification("")}
+          />
+        )}
+        {errorMessage && (
+          <Notification
+            message={errorMessage}
+            type="error"
+            onClose={() => setErrorMessage("")}
+          />
+        )}
 
         <Form onSubmit={handleSubmit(onSubmit)}>
           <InputGroup>
