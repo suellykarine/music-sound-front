@@ -65,6 +65,7 @@ export const MenuItem = styled.a`
   margin-bottom: 5px;
   transition: background 0.3s;
   position: relative;
+  cursor: pointer;
 
   &:hover ${Tooltip} {
     background: rgba(255, 255, 255, 0.1);

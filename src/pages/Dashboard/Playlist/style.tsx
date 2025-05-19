@@ -54,6 +54,9 @@ export const PlaylistCard = styled.div`
     transform: scale(1.03);
     background: rgba(255, 255, 255, 0.1);
   }
+  #trash {
+    margin-left: 90%;
+  }
 `;
 
 export const PlaylistCover = styled.div`

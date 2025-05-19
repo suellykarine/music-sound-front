@@ -1,8 +1,11 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-
 import { Button } from "../../ui/Button";
+
+import { Notification } from "../../ui/Notification";
 import {
   CloseButton,
   ErrorText,
@@ -42,9 +45,26 @@ export const RegisterModal = ({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Dados do cadastro:", data);
-    onClose();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      await axios.post("http://127.0.0.1:8000/usuario/registrar/", {
+        email: data.email,
+        senha: data.password,
+      });
+      setSuccessMessage("Usuário cadastrado com sucesso!");
+      setTimeout(() => {
+        setSuccessMessage("");
+        onClose();
+      }, 2000);
+    } catch (error) {
+      setErrorMessage(
+        "Erro no cadastro. Verifique os dados e tente novamente."
+      );
+      setTimeout(() => setErrorMessage(""), 3000);
+    }
   };
 
   return (
@@ -92,6 +112,21 @@ export const RegisterModal = ({
             Criar Conta
           </Button>
         </Form>
+        {successMessage && (
+          <Notification
+            message={successMessage}
+            type="success"
+            onClose={() => setSuccessMessage("")}
+          />
+        )}
+
+        {errorMessage && (
+          <Notification
+            message={errorMessage}
+            type="error"
+            onClose={() => setErrorMessage("")}
+          />
+        )}
 
         <SwitchText>
           Já tem uma conta?{" "}
