@@ -4,6 +4,7 @@ A sua plataforma de streaming musical intuitiva e personalizável.
 Soundwave é uma aplicação front-end desenvolvida em React, que você pode: 
 
 • 📁 Criar e organizar playlists do seu próprio estilo
+
 • 🔍 Descobrir novas músicas através de buscas inteligentes
 
 ### 🛠️ Tecnologias e dependências principais
@@ -34,15 +35,15 @@ React Toastify 11.0.5
 
 🎶 Gerenciamento de Playlists:
 
-   - 📜  Listar todas as playlists criadas pelo usuário.
+    📜  Listar todas as playlists criadas pelo usuário.
 
-   - ➕ Criar novas playlists personalizadas.
+    ➕ Criar novas playlists personalizadas.
 
-   - ➕ Adicionar músicas às playlists existentes.
+    ➕ Adicionar músicas às playlists existentes.
 
-  - ❌ Deletar músicas indesejadas das playlists.
+   ❌ Deletar músicas indesejadas das playlists.
 
-  - ❌ Deletar playlists.
+   ❌ Deletar playlists.
 
 ## 🌐 Integração com API externa
 
